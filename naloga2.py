@@ -17,7 +17,7 @@ def main():
         }
     }
 
-    koraki = 1  # defined outside the dict
+    koraki = 2  # defined outside the dict
 
     znacilke = podatki["znacilke"]
     razredi = podatki["razredi"]["Kolo"]
@@ -26,20 +26,49 @@ def main():
 
 def H(verjetnosti: list):
     ent = 0
-    for item in verjetnosti:
-        ent -= item * log2(item)
     
+    for item in verjetnosti:
+        if item != 0:
+            ent -= item * log2(item)
+
+    print(verjetnosti)
+    print(ent)
     return ent
 
                                         
-def tocnost(t, locilke_list, locilke_dict, nivo, koraki, stVseh):
+def tocnost(t, locilke_list, locilke_dict, nivo, koraki, stVseh, razredi_set):
     if not t: # ce nobena pot ne vodi sem je verjetnost 0 in tudi ta clen entropije je 0
         return 0
-    
+
+
     if nivo == koraki:
         # mora vrnit clen za izracun entropije(verjetnost*entropija ...)
         # da se potem sestavi v vecji rezultat
-        return
+        attr = locilke_list[nivo-1]
+        rez = {}
+        for r in razredi_set:
+            rez[r] = 0
+        
+    
+        for item in t:
+            odlocitev = item["Razred"]
+            rez[odlocitev] += 1
+
+        max_value = max(rez.values())
+        max_key = max(rez, key=rez.get)
+        total = sum(rez.values())
+        p = []
+        counterTocnih = 0
+        for key, stevilo in rez.items():
+            p.append(stevilo / total)
+            if key == max_key:
+                counterTocnih += stevilo
+
+
+        clen = total/stVseh * H(p)   
+        return(clen, counterTocnih)
+
+        
     
     attr = locilke_list[nivo]
     opcije = locilke_dict[attr]
@@ -54,11 +83,14 @@ def tocnost(t, locilke_list, locilke_dict, nivo, koraki, stVseh):
         o = t[i][attr]
         dd[o].append(t[i])
     
+    clen = 0
+    stTocnih = 0
     for key, seznam in dd.items():
-        tocnost(seznam, locilke_list, locilke_dict, nivo+1, koraki, stVseh)
-
-        
-            
+        sub_clen, sub_tocni = tocnost(seznam, locilke_list, locilke_dict, nivo + 1, koraki, stVseh, razredi_set)
+        clen += sub_clen
+        stTocnih += sub_tocni
+    
+    return (clen, stTocnih)           
 
 def naloga2(znacilke: dict, razredi: list, koraki: int) -> tuple:
 
@@ -130,9 +162,12 @@ def naloga2(znacilke: dict, razredi: list, koraki: int) -> tuple:
         locilke_dict[l] = list(d[l].keys())
     # locilke so po vrsti kot morajo bit zaradi heapa
 
-    rez = tocnost(vsiStolpci, locilke_list, locilke_dict, 0, koraki, stVseh)           
-    # mora bit tuple (entropija, tocnost)
+    tup = tocnost(vsiStolpci, locilke_list, locilke_dict, 0, koraki, stVseh, set(razredi))           
+    print(tup)
+    rez = (tup[0], tup[1] / len(razredi))
+    print(rez)
     return rez
+    # mora bit tuple (entropija, tocnost)
 
 #delete at the end
 if __name__ == "__main__":
