@@ -3,27 +3,6 @@ from math import log2
 from collections import Counter
 import heapq
 
-    
-def main():
-    podatki = {
-        "ime": "Kolesarjenje",
-        "znacilke": {
-            "Nebo": ["j", "j", "j", "j", "j", "j", "o", "o", "o", "o"],
-            "Temp": ["h", "h", "t", "h", "h", "t", "t", "t", "t", "t"],
-            "Veter": ["v", "v", "v", "m", "m", "m", "v", "v", "m", "m"]
-        },
-        "razredi": {
-            "Kolo": ["d", "n", "d", "d", "d", "d", "n", "n", "d", "n"]
-        }
-    }
-
-    koraki = 2  # defined outside the dict
-
-    znacilke = podatki["znacilke"]
-    razredi = podatki["razredi"]["Kolo"]
-
-    naloga2(znacilke, razredi, koraki)
-
 def H(verjetnosti: list):
     ent = 0
     
@@ -31,8 +10,6 @@ def H(verjetnosti: list):
         if item != 0:
             ent -= item * log2(item)
 
-    print(verjetnosti)
-    print(ent)
     return ent
 
                                         
@@ -72,9 +49,6 @@ def tocnost(t, locilke_list, locilke_dict, nivo, koraki, stVseh, razredi_set):
     
     attr = locilke_list[nivo]
     opcije = locilke_dict[attr]
-    # print(attr)
-    # print(opcije)
-    # print(t)
     dd = {}
     for i in opcije:
         dd[i] = []
@@ -162,13 +136,7 @@ def naloga2(znacilke: dict, razredi: list, koraki: int) -> tuple:
         locilke_dict[l] = list(d[l].keys())
     # locilke so po vrsti kot morajo bit zaradi heapa
 
-    tup = tocnost(vsiStolpci, locilke_list, locilke_dict, 0, koraki, stVseh, set(razredi))           
-    print(tup)
+    tup = tocnost(vsiStolpci, locilke_list, locilke_dict, 0, koraki, stVseh, set(razredi)) 
     rez = (tup[0], tup[1] / len(razredi))
-    print(rez)
     return rez
     # mora bit tuple (entropija, tocnost)
-
-#delete at the end
-if __name__ == "__main__":
-    main()
